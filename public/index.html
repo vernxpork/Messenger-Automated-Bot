@@ -1,42 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Messenger-Automated-Bot</title>
-    <!-- Meta Tags -->
-    <meta property="og:title" content="Messenger-Automated-Bot" />
-    <meta property="og:description" content="Create your own Facebook Bot Account without coding skills" />
-    <meta property="og:image" content="favicon.ico" />
-    <meta property="og:locale" content="en_US" />
+    <title>Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <!-- CSS Links -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="styles.css" />
 
+    <!-- Custom Styles -->
     <style>
-      hr {
-        padding: 1px;
-        border: 1px solid black;
-        border-radius: 4px;
-        animation: rainbow 1s linear infinite;
-      }
-
-      @keyframes rainbow {
-        0% { background-color: #ff0000; }
-        16.67% { background-color: #ff7f00; }
-        33.33% { background-color: #ffff00; }
-        50% { background-color: #00ff00; }
-        66.67% { background-color: #0000ff; }
-        83.33% { background-color: #4b0082; }
-        100% { background-color: #9400d3; }
-      }
-
-      .navbar {
-        animation: slideDown 1s ease-out;
-        border-radius: 20px;
+      @keyframes running-color {
+        0% { color: orange; }
+        25% { color: green; }
+        50% { color: blue; }
+        75% { color: purple; }
+        100% { color: orange; }
       }
 
       @keyframes slideDown {
@@ -44,168 +24,167 @@
         to { transform: translateY(0); opacity: 1; }
       }
 
-      @keyframes running-color {
-        0% { color: orange; }
-        25% { color: green; }
-        30% { color: lime; }
-        50% { color: blue; }
-        75% { color: purple; }
-        100% { color: orange; }
+      .navbar {
+        animation: slideDown 0.8s ease-out;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
 
-      #running-text {
-        animation: running-color 1.5s infinite;
-        color: blue;
+      .navbar-brand {
+        font-weight: 600;
+        font-size: 20px;
+        animation: running-color 1.8s infinite;
       }
 
-      .card {
+      h1 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+      }
+
+      .container {
+        margin-top: 20px;
         margin-bottom: 20px;
       }
 
-      .step {
-        background-color: #f4f4f4;
-        padding: 10px;
-        margin-bottom: 20px;
+      .form-control {
+        min-height: 150px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
       }
 
-      #json-data {
-        color: black;
-        background-image: url('https://i.imgur.com/GmYVwpP.jpeg');
-        background-size: cover;
-        background-repeat: no-repeat;
+      .footer {
+        padding: 20px;
+        background-color: #f1f1f1;
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+      }
+
+      button {
+        margin-top: 10px;
       }
     </style>
   </head>
   <body>
-    <div id="secondModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <div class="container">
-          <div class="row">
-            <h1 class="col text-start" style="margin-left: 12px; font-size: 20px;">Current Online:</h1>
-          </div>
-          <div class="row" id="user_online"></div>
-        </div>
-      </div>
-    </div>
-    <br>
-
-    <div id="thirdModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <div id="guidez"></div>
-      </div>
-    </div>
-    <br>
-
-    <div id="firstModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <center><img style="width:50px" src="8466362.png"></center>
-        <div id="news"></div>
-      </div>
-    </div>
-
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
-      <a class="navbar-brand" id="running-text" href="/">Messenger-Automated-Bot</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Home</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav" style="margin-right: 70px;">
         <ul class="navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="/">🏠Home</a>
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Features
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Cookies Extractor</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/step_by_step_guide">Step-by-Step Guide</a>
+            </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="openSecondModalBtn">🤖Active</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="openThirdModalBtn">📃Guide</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https://www.facebook.com/profile.php?id=61550009025395">👤Contact Developer</a>
+            <a class="nav-link" href="online_user">Active</a>
           </li>
         </ul>
       </div>
     </nav>
 
+    <!-- Main Container -->
     <div class="container">
-      <!-- Cover Image -->
-      <div class="text-center mb-3">
-        <img src="https://i.imgur.com/GmYVwpP.jpeg" class="img-fluid rounded" style="max-height: 250px;" alt="Appstate Cover Image">
-      </div>
-
-      <h1 class="col text-center" style="font-size: 20px; padding: 10px;">APPSTATE</h1>
+      <h1 class="text-center" style="font-size: 20px; padding: 10px;">𝐀𝐔𝐓𝐎-𝐁𝐎𝐓</h1>
       <form id="json-form" onsubmit="submitForm(event)">
         <div class="row">
           <div class="col-md-12">
-            <textarea id="json-data" class="form-control centered-textarea center-placeholder" placeholder="Your Cookie"></textarea>
+            <textarea
+              id="json-data"
+              class="form-control centered-textarea center-placeholder"
+              placeholder=""
+            ></textarea>
           </div>
         </div>
       </form>
-      <p id="cookieInfo" style="margin-top: 10px"></p>
-      <hr>
+      <p style="margin-top: 10px">Greetings! Begin by entering your cookie. Scroll down to carefully review our Terms and Privacy.</p>
     </div>
 
+    <!-- Terms -->
+    <div class="container">
+      <h1 class="text-center" style="font-size: 20px; padding: 10px;">Terms and Conditions and Privacy Policy</h1>
+      <p>* Persistent Connection: Your chatbot stays active post-login, unless you change the password.</p>
+      <p>* Cookie Security: Never share your cookie; it's vital for your account's security.</p>
+      <p>* Strong Passwords: Use unique, robust passwords. Avoid Direct Bot Access: Doing so may disrupt service.</p>
+      <p>* Troubleshooting: If the bot is unresponsive, return to the website. If problems persist, change the account.</p>
+      <p>* Dummy Accounts: Use disposable accounts for added security.</p>
+      <p>* No Malicious Use: Malicious activity will result in termination and potential legal action.</p>
+      <p>* Disclaimers: We are not responsible for unauthorized access, account locking, or hosting platform actions.</p>
+      <p>* Terms of Service: Adhere to hosting platform terms.</p>
+    </div>
+
+    <!-- Commands Section -->
     <div class="container" id="listOfCommands">
-      <h1 style="font-size: 16px; padding: 10px;">Choose your commands by tapping on the respective options.</h1>
+      <h1 style="font-size: 16px; padding: 10px;">Please choose your commands by tapping on the respective options.</h1>
       <button class="btn btn-primary" onclick="selectAllCommands()">Select all commands</button>
-      <hr>
     </div>
 
     <div class="container" id="listOfCommandsEvent">
       <h1 style="font-size: 16px; padding: 10px;">Please choose your event commands by tapping on the respective options.</h1>
       <button class="btn btn-primary" onclick="selectAllEvents()">Select all events</button>
-      <hr>
     </div>
 
     <div class="container" id="prefixOfCommands">
       <h1 style="font-size: 16px; padding: 10px;">Please provide a prefix (optional). If you choose not to, entering 'non-prefix' will be considered as your input</h1>
-      <input type="text" style="width:100%" id="inputOfPrefix">
-      <hr>
+      <input type="text" id="inputOfPrefix" class="form-control" />
     </div>
 
     <div class="container" id="adminOfCommands">
-      <h1 style="font-size: 16px; padding: 10px;">Please provide Admin uid (optional). If you choose not to, entering 'default' will be considered as your input</h1>
-      <input type="text" id="inputOfAdmin" style="width:100%">
-      <hr>
+      <h1 style="font-size: 16px; padding: 10px;">Please provide an uid (optional). If you choose not to, entering 'default' will be considered as your input</h1>
+      <input type="text" id="inputOfAdmin" class="form-control" />
     </div>
 
     <div class="container">
       <label style="font-size: 14px; display: flex; align-items: center; padding: 22px;">
-        <input type="checkbox" id="agreeCheckbox" style="margin-right: 10px;"> Checking this box certifies that I have read, understood, and agreed to the Terms and Conditions.
+        <input type="checkbox" id="agreeCheckbox" style="margin-right: 10px;" />
+        Checking this box certifies that I have read, understood, and agreed to the Terms and Conditions.
       </label>
-
-      <div id="result" class="container text-center" style="display: none;"></div>
       <div class="col text-center">
         <button class="btn btn-primary" onclick="State()" disabled id="submitButton" style="width: 100%">Submit</button>
       </div>
     </div>
 
-    <marquee>This Website is Maintained and Developed by KYSLER | Time: <i id="time"></i></marquee>
-    <center>
-      <p style="color: orange">
-        <img style="width:20px;height:20px;padding-top:10px" src="ls.png">
-        <img style="width:20px;height:20px;padding-top:10px" src="favicon.ico">
-      </p>
-    </center>
+    <div id="result" class="container text-center" style="display: none;"></div>
 
+    <!-- Footer -->
     <div class="footer">
-      <p>Version: <span id="version"></span></p>
+      <p>Time: <span id="time"></span></p>
       <p>Ping: <span id="ping"></span></p>
     </div>
 
     <!-- JS Scripts -->
-    <script src="m.js"></script>
-    <script src="shield.js"></script>
-    <script src="guide.js"></script>
-    <script src="Zzz.js"></script>
+    <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
