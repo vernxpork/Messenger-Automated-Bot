@@ -9,7 +9,7 @@ module.exports.config = {
     description: "Fetch a random Shoti video.",
     prefix: false,
     premium: false,
-    credits: "Akimitsu",
+    credits: "Vern",
     cooldowns: 10,
     category: "media"
 };
