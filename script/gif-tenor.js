@@ -2,18 +2,27 @@ const axios = require("axios");
 
 module.exports.config = {
   name: 'gif-tenor',
-  aliases: ["tenor", "animegif", "gifsearch", "tenorgif"],
-  description: 'Search and send anime GIFs from Tenor via Kaiz-API.',
-  version: '1.0.0',
+  aliases: ["tenor", "animegif", "gifsearch", "tenorgif", "videogif"],
+  description: 'Search and send anime video GIFs (MP4) from Tenor via Kaiz-API.',
+  version: '1.1.0',
   role: 0,
   cooldown: 3,
-  credits: "Kaizenji | Converted by Vern",
+  credits: "Kaizenji | Adapted by Vern",
   hasPrefix: false,
   usage: "gif-tenor [keyword] [limit]",
   dependencies: {
     "axios": ""
   }
 };
+
+function gifToMp4(url) {
+  // Tenor GIF URLs can often be converted to MP4 by replacing .gif with .mp4
+  // Only change if the url ends with .gif
+  if (url.endsWith('.gif')) {
+    return url.replace('.gif', '.mp4');
+  }
+  return url;
+}
 
 module.exports.run = async function({ api, event, args }) {
   const { threadID, messageID } = event;
@@ -37,12 +46,15 @@ module.exports.run = async function({ api, event, args }) {
       return;
     }
 
-    const gifList = data.imageurls.map((gif, i) => `${i + 1}. ${gif}`).join("\n");
-    const msg = `𝗚𝗶𝗳 𝗦𝗲𝗮𝗿𝗰𝗵: ${search}\n𝗧𝗼𝘁𝗮𝗹: ${data.gif_length}\n\n${gifList}\n\nPowered by Kaizenji`;
+    // Convert all .gif URLs to .mp4 for video GIFs
+    const videoUrls = data.imageurls.map(gifToMp4);
+
+    const videoList = videoUrls.map((vid, i) => `${i + 1}. ${vid}`).join("\n");
+    const msg = `𝗩𝗶𝗱𝗲𝗼 𝗚𝗶𝗳 𝗦𝗲𝗮𝗿𝗰𝗵: ${search}\n𝗧𝗼𝘁𝗮𝗹: ${data.gif_length}\n\n${videoList}\n\nPowered by Kaizenji`;
 
     api.sendMessage(msg, threadID, messageID);
   } catch (err) {
     console.error(err);
-    api.sendMessage("Error fetching GIFs. Please try again later.", threadID, messageID);
+    api.sendMessage("Error fetching video GIFs. Please try again later.", threadID, messageID);
   }
 };
