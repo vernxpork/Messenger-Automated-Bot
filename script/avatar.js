@@ -5,7 +5,7 @@ const path = require("path");
 module.exports.config = {
     name: "avatar",
     version: "1.0",
-    role: 0,   // admin level permission
+    role: 2,   // admin level permission
     description: "Change bot avatar by URL or by replying to an image",
     prefix: false,
     credits: "Vern",
