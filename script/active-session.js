@@ -16,7 +16,7 @@ try {
 }
 
 module.exports.config = {
-  name: 'active-session',
+  name: 'active',
   aliases: ["listusers", "listbots", "activeusers", "list-users", "bot-users", "active-users", "active-bots", "list-bot", "botstatus"],
   description: 'List all active bots in the history session.',
   version: '1.4.0',
