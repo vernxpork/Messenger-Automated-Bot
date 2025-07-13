@@ -17,47 +17,50 @@ module.exports.run = async function ({ api, event, args }) {
   const city = args.join(' ').trim();
   const prefix = "/"; // Change if your bot uses a dynamic prefix
 
-  // No city provided
+  // If city is not provided
   if (!city) {
-    const usageMessage = `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
-      `⚠️ Please provide a city name to get the weather.\n\n` +
+    const usageMessage = 
+      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
+      `⚠️ Oops! Please provide a city name to check the weather.\n\n` +
       `📌 Usage: ${prefix}weather <city>\n` +
       `💬 Example: ${prefix}weather Cebu\n\n` +
-      `> Thank you for using the Weather command!`;
+      `> Thank you for keeping up with the weather!`;
 
     return api.sendMessage(usageMessage, threadID, messageID);
   }
 
   try {
-    // Send loading message first
-    const waitMsg = `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
-      `☁️ Checking the weather for "${city}"... Please wait!`;
+    // Friendly loading message
+    const waitMsg = 
+      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
+      `🌦️ Looking up the sky over "${city}"... Please wait just a moment!`;
     await api.sendMessage(waitMsg, threadID, messageID);
 
-    // Call the Kaiz Weather API
+    // Fetch weather from API
     const apiUrl = "https://kaiz-apis.gleeze.com/api/weather";
     const response = await axios.get(apiUrl, {
       params: {
         q: city,
         apikey: "4fe7e522-70b7-420b-a746-d7a23db49ee5"
-      }
+      },
+      timeout: 10000
     });
 
     const data = response.data;
     let resultMsg = `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n`;
 
     if (data && data.name) {
-      // Humanize: friendly intro
+      // Humanized greetings
       const intros = [
-        `🌤️ Here's the weather for ${data.name}, ${data.sys?.country || ''}:`,
+        `🌤️ Here's the weather for ${data.name}${data.sys?.country ? `, ${data.sys.country}` : ''}:`,
         `☀️ Weather update for ${data.name}:`,
-        `🌦️ Curious about the sky in ${data.name}? Here you go:`,
+        `🌦️ Curious about the sky in ${data.name}? Let's check:`,
         `🌈 Weather in ${data.name} at a glance:`
       ];
       const intro = intros[Math.floor(Math.random() * intros.length)];
       resultMsg += `${intro}\n\n`;
 
-      // Weather details
+      // Weather summary with emoji for feels
       if (data.weather && data.weather[0]) {
         resultMsg += `• Condition: ${data.weather[0].main} (${data.weather[0].description})\n`;
       }
@@ -77,7 +80,7 @@ module.exports.run = async function ({ api, event, args }) {
         resultMsg += `• Wind: ${data.wind.speed} m/s\n`;
       }
       if (typeof data.visibility !== "undefined") {
-        resultMsg += `• Visibility: ${data.visibility / 1000} km\n`;
+        resultMsg += `• Visibility: ${(data.visibility / 1000).toFixed(1)} km\n`;
       }
       if (typeof data.clouds?.all !== "undefined") {
         resultMsg += `• Cloudiness: ${data.clouds.all}%\n`;
@@ -86,21 +89,29 @@ module.exports.run = async function ({ api, event, args }) {
         resultMsg += `• Low/High: ${data.main.temp_min}°C/${data.main.temp_max}°C\n`;
       }
 
-      resultMsg += `\n> Stay safe and have a great day! 🌞\n> Powered by Kaiz APIs`;
+      resultMsg += `\n> ☔ Stay safe, bring an umbrella if needed, and have a wonderful day!\n> Powered by Kaiz APIs`;
     } else if (data?.message) {
       resultMsg += `⚠️ ${data.message}`;
     } else {
-      resultMsg += "⚠️ Sorry, couldn't find weather info for that city.";
+      resultMsg += "⚠️ Sorry, I couldn't find weather info for that city. Please check the spelling or try another location!";
     }
 
     return api.sendMessage(resultMsg, threadID, messageID);
 
   } catch (error) {
-    console.error('❌ Error in weather command:', error.message || error);
+    console.error('❌ Error in weather command:', error && error.response && error.response.data ? error.response.data : error.message || error);
 
-    const errorMessage = `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 𝗘𝗥𝗥𝗢𝗥 』════\n\n` +
-      `🚫 Failed to fetch the weather info.\nReason: ${error.response?.data?.message || error.message || 'Unknown error'}\n\n` +
-      `> Please try again later.`;
+    let errMsg = "Unknown error";
+    if (error.response && error.response.data && error.response.data.message) {
+      errMsg = error.response.data.message;
+    } else if (error.message) {
+      errMsg = error.message;
+    }
+
+    const errorMessage = 
+      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 𝗘𝗥𝗥𝗢𝗥 』════\n\n` +
+      `🚫 Failed to fetch the weather info.\nReason: ${errMsg}\n\n` +
+      `> Please try again in a bit.`;
 
     return api.sendMessage(errorMessage, threadID, messageID);
   }
