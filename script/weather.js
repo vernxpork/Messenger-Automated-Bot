@@ -2,117 +2,74 @@ const axios = require('axios');
 
 module.exports.config = {
   name: "weather",
-  version: "1.0.0",
+  version: "1.1.0",
   role: 0,
-  credits: "vern",
-  description: "Get the current weather info for a city.",
+  credits: "vern + chatgpt",
+  description: "Get the current weather using OpenWeatherMap.",
   usage: "/weather <city>",
   prefix: false,
-  cooldowns: 3,
-  commandCategory: "Utility"
+  cooldowns: 5,
+  commandCategory: "utility"
 };
 
 module.exports.run = async function ({ api, event, args }) {
-  const { threadID, messageID } = event;
-  const city = args.join(' ').trim();
-  const prefix = "/"; // Change if your bot uses a dynamic prefix
+  const { threadID } = event;
+  const city = args.join(" ").trim();
+  const prefix = "/"; // Replace this if using a dynamic prefix
+  const apiKey = "f4c4bb0896f91549fc530d12feceb8f7"; // <<== Paste your API key here
 
-  // If city is not provided
   if (!city) {
-    const usageMessage = 
-      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
-      `⚠️ Oops! Please provide a city name to check the weather.\n\n` +
-      `📌 Usage: ${prefix}weather <city>\n` +
-      `💬 Example: ${prefix}weather Cebu\n\n` +
-      `> Thank you for keeping up with the weather!`;
-
-    return api.sendMessage(usageMessage, threadID, messageID);
+    return api.sendMessage(
+      `☁️ Please provide a city name.\n\n` +
+      `Usage: ${prefix}weather <city>\nExample: ${prefix}weather Manila`,
+      threadID
+    );
   }
 
   try {
-    // Friendly loading message
-    const waitMsg = 
-      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n` +
-      `🌦️ Looking up the sky over "${city}"... Please wait just a moment!`;
-    await api.sendMessage(waitMsg, threadID, messageID);
+    // Loading message
+    await api.sendMessage(`☁️ Fetching weather for "${city}"...`, threadID);
 
-    // Fetch weather from API
-    const apiUrl = "https://kaiz-apis.gleeze.com/api/weather";
-    const response = await axios.get(apiUrl, {
+    const response = await axios.get("https://api.openweathermap.org/data/2.5/weather", {
       params: {
         q: city,
-        apikey: "4fe7e522-70b7-420b-a746-d7a23db49ee5"
+        appid: apiKey,
+        units: "metric"
       },
       timeout: 10000
     });
 
     const data = response.data;
-    let resultMsg = `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 』════\n\n`;
 
-    if (data && data.name) {
-      // Humanized greetings
-      const intros = [
-        `🌤️ Here's the weather for ${data.name}${data.sys?.country ? `, ${data.sys.country}` : ''}:`,
-        `☀️ Weather update for ${data.name}:`,
-        `🌦️ Curious about the sky in ${data.name}? Let's check:`,
-        `🌈 Weather in ${data.name} at a glance:`
-      ];
-      const intro = intros[Math.floor(Math.random() * intros.length)];
-      resultMsg += `${intro}\n\n`;
+    const introLines = [
+      `🌤️ Here's the weather for ${data.name}, ${data.sys.country}:`,
+      `☀️ Weather report for ${data.name}:`,
+      `🌦️ What's the sky like in ${data.name}?`,
+      `🌈 Weather at a glance for ${data.name}:`
+    ];
 
-      // Weather summary with emoji for feels
-      if (data.weather && data.weather[0]) {
-        resultMsg += `• Condition: ${data.weather[0].main} (${data.weather[0].description})\n`;
-      }
-      if (typeof data.main?.temp !== "undefined") {
-        resultMsg += `• Temperature: ${data.main.temp}°C\n`;
-      }
-      if (typeof data.main?.feels_like !== "undefined") {
-        resultMsg += `• Feels like: ${data.main.feels_like}°C\n`;
-      }
-      if (typeof data.main?.humidity !== "undefined") {
-        resultMsg += `• Humidity: ${data.main.humidity}%\n`;
-      }
-      if (typeof data.main?.pressure !== "undefined") {
-        resultMsg += `• Pressure: ${data.main.pressure} hPa\n`;
-      }
-      if (typeof data.wind?.speed !== "undefined") {
-        resultMsg += `• Wind: ${data.wind.speed} m/s\n`;
-      }
-      if (typeof data.visibility !== "undefined") {
-        resultMsg += `• Visibility: ${(data.visibility / 1000).toFixed(1)} km\n`;
-      }
-      if (typeof data.clouds?.all !== "undefined") {
-        resultMsg += `• Cloudiness: ${data.clouds.all}%\n`;
-      }
-      if (typeof data.main?.temp_min !== "undefined" && typeof data.main?.temp_max !== "undefined") {
-        resultMsg += `• Low/High: ${data.main.temp_min}°C/${data.main.temp_max}°C\n`;
-      }
+    const intro = introLines[Math.floor(Math.random() * introLines.length)];
 
-      resultMsg += `\n> ☔ Stay safe, bring an umbrella if needed, and have a wonderful day!\n> Powered by Kaiz APIs`;
-    } else if (data?.message) {
-      resultMsg += `⚠️ ${data.message}`;
-    } else {
-      resultMsg += "⚠️ Sorry, I couldn't find weather info for that city. Please check the spelling or try another location!";
-    }
+    const resultMsg = 
+      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 𝗨𝗣𝗗𝗔𝗧𝗘 』════\n\n` +
+      `${intro}\n\n` +
+      `• Condition: ${data.weather[0].main} (${data.weather[0].description})\n` +
+      `• Temperature: ${data.main.temp}°C\n` +
+      `• Feels Like: ${data.main.feels_like}°C\n` +
+      `• Humidity: ${data.main.humidity}%\n` +
+      `• Wind Speed: ${data.wind.speed} m/s\n` +
+      `• Visibility: ${(data.visibility / 1000).toFixed(1)} km\n` +
+      `• Pressure: ${data.main.pressure} hPa\n` +
+      `• Min/Max: ${data.main.temp_min}°C / ${data.main.temp_max}°C\n\n` +
+      `> Stay dry, stay safe 🌂`;
 
-    return api.sendMessage(resultMsg, threadID, messageID);
-
-  } catch (error) {
-    console.error('❌ Error in weather command:', error && error.response && error.response.data ? error.response.data : error.message || error);
-
-    let errMsg = "Unknown error";
-    if (error.response && error.response.data && error.response.data.message) {
-      errMsg = error.response.data.message;
-    } else if (error.message) {
-      errMsg = error.message;
-    }
-
-    const errorMessage = 
-      `════『 𝗪𝗘𝗔𝗧𝗛𝗘𝗥 𝗘𝗥𝗥𝗢𝗥 』════\n\n` +
-      `🚫 Failed to fetch the weather info.\nReason: ${errMsg}\n\n` +
-      `> Please try again in a bit.`;
-
-    return api.sendMessage(errorMessage, threadID, messageID);
+    return api.sendMessage(resultMsg, threadID);
+    
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message || "Unknown error";
+    return api.sendMessage(
+      `🚫 Unable to fetch weather for "${city}".\nReason: ${errorMsg}`,
+      threadID
+    );
   }
 };
