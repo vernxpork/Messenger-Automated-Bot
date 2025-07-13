@@ -4,7 +4,7 @@ module.exports.config = {
   name: "weather",
   version: "1.1.0",
   role: 0,
-  credits: "vern + chatgpt",
+  credits: "vern",
   description: "Get the current weather using OpenWeatherMap.",
   usage: "/weather <city>",
   prefix: false,
