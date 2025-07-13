@@ -5,7 +5,7 @@ module.exports.config = {
   name: "hack",
   version: "1.0",
   role: 0,
-  credits: "Kaizenji",
+  credits: "Vern",
   description: "Generate a hacking meme for a user by UID.",
   cooldown: 5,
   hasPrefix: true,
