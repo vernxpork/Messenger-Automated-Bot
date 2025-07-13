@@ -17,11 +17,11 @@ module.exports.config = {
 module.exports.run = async ({ api, event }) => {
 	try {
 		const ownerInfo = {
-			name: `JL MAGNO`,
+			name: `Hex Khedd`,
 			gender: 'MALE',
-			age: '18',
+			age: '20',
 			height: '69',
-			facebookLink: `https://www.facebook.com/61554265433272`,
+			facebookLink: `https://www.facebook.com/profile.php?id=61578317246836`,
 			status: 'DOUBLE'
 		};
 
