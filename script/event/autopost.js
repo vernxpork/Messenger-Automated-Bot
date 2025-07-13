@@ -1,70 +1,60 @@
 module.exports.config = {
-    name: "autopost",
+    name: "autopostcatfact",
     version: "1.0.0",
 };
 
 let isPosting = false;
+let intervalStarted = false;
 
 module.exports.handleEvent = async function ({ api }) {
-    const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    // Start the interval only once to prevent multiple timers.
+    if (intervalStarted) return;
+    intervalStarted = true;
 
-    const downloadImage = async (url) => {
-        const axios = require('axios');
-        const fs = require("fs");
-        const path = require("path");
-        const imagePath = path.join(__dirname, 'dog.jpg');
-
-        const response = await axios({
-            method: 'GET',
-            url,
-            responseType: 'stream'
-        });
-
-        return new Promise((resolve, reject) => {
-            const stream = response.data.pipe(fs.createWriteStream(imagePath));
-            stream.on('finish', () => resolve(imagePath));
-            stream.on('error', (err) => reject(err));
-        });
-    };
-
-    const postImage = async () => {
-        if (isPosting) return; 
+    const postCatFact = async () => {
+        if (isPosting) return;
         isPosting = true;
 
         try {
             const axios = require('axios');
-            const fs = require("fs");
 
-            let imageUrl;
-            let attempts = 0;
+            // Get a cat fact from the API
+            const response = await axios.get("https://kaiz-apis.gleeze.com/api/catfact?apikey=4fe7e522-70b7-420b-a746-d7a23db49ee5");
 
-            do {
-                const response = await axios.get("https://rest-api.joshuaapostol.site/random-dog-image");
-                imageUrl = response.data.url;
-                attempts++;
-            } while (!validImageExtensions.some(ext => imageUrl.endsWith(ext)) && attempts < 5);
+            let catFact = response.data?.result || "Here's a fun cat fact for you!";
 
-            if (!validImageExtensions.some(ext => imageUrl.endsWith(ext))) {
-                throw new Error('No valid image found after several attempts.');
-            }
+            // Humanize: add some flavor text before the fact randomly
+            const greetings = [
+                "🐾 Did you know?",
+                "😺 Cat Fact:",
+                "Here's something purr-fectly interesting:",
+                "Time for a feline fun fact!",
+                "Paws up! Fact incoming:",
+                "😻 Fun Cat Fact:"
+            ];
+            const greeting = greetings[Math.floor(Math.random() * greetings.length)];
 
-            const imagePath = await downloadImage(imageUrl);
+            // Compose the post message
+            const message = `${greeting}\n${catFact}`;
 
+            // Post the message
             await api.createPost({
-                attachment: fs.createReadStream(imagePath),
+                body: message,
                 visibility: "Everyone"
             });
 
-            fs.unlinkSync(imagePath);
         } catch (error) {
-            console.error('Error posting image:', error);
+            console.error('Error posting cat fact:', error);
         } finally {
-            isPosting = false; 
+            isPosting = false;
         }
     };
 
-    // Using setInterval for scheduling every 10 minutes
+    // Schedule every 10 minutes
     setInterval(() => {
-        postImage();
-    }, 5 * 60 * 1000);
+        postCatFact();
+    }, 10 * 60 * 1000);
+
+    // Optionally trigger immediately on startup
+    postCatFact();
 };
