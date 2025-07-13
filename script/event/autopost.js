@@ -7,7 +7,6 @@ let isPosting = false;
 let intervalStarted = false;
 
 module.exports.handleEvent = async function ({ api }) {
-    // Ensure only one interval is running
     if (intervalStarted) return;
     intervalStarted = true;
 
@@ -17,38 +16,25 @@ module.exports.handleEvent = async function ({ api }) {
         try {
             const axios = require('axios');
             const response = await axios.get("https://kaiz-apis.gleeze.com/api/catfact?apikey=4fe7e522-70b7-420b-a746-d7a23db49ee5");
-            const catFact = response.data?.result || "Here's a fun cat fact for you!";
 
-            // Humanized intro
-            const greetings = [
-                "🐾 Did you know?",
-                "😺 Cat Fact:",
-                "Here's something purr-fectly interesting:",
-                "Time for a feline fun fact!",
-                "Paws up! Fact incoming:",
-                "😻 Fun Cat Fact:"
-            ];
-            const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+            const catFact = response.data?.result || "Cats are mysterious creatures.";
 
-            const message =
-                `════『 𝗔𝗨𝗧𝗢 𝗖𝗔𝗧 𝗙𝗔𝗖𝗧 』════\n\n` +
-                `${greeting}\n${catFact}\n\n` +
-                `> Stay pawsitive and share the feline fun! 🐈`;
+            const message = `🐱 ${catFact}`;
 
             await api.createPost({
                 body: message,
                 visibility: "Everyone"
             });
         } catch (error) {
-            console.error('Error posting cat fact:', error?.message || error);
+            console.error('Error auto-posting cat fact:', error?.message || error);
         } finally {
             isPosting = false;
         }
     };
 
-    // Immediately post on startup
+    // Post once immediately
     postCatFact();
 
-    // Post every 10 minutes
+    // Repeat every 10 minutes
     setInterval(postCatFact, 10 * 60 * 1000);
 };
