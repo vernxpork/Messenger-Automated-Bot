@@ -1,137 +1,97 @@
+const fs = require("fs-extra");
+const axios = require("axios");
+const path = require("path");
+
 module.exports.config = {
-  name: "post",
-  version: "1.0.0",
-  role: 1,
-  credits: "Vern",
-  description: "Create a new post in acc bot.",
-  commandCategory: "Tiện ích",
-  cooldowns: 5,
-  hasPrefix: true
+    name: "post",
+    version: "1.5.0",
+    role: 2,
+    description: "Create a Facebook post with message and optional attachment.",
+    prefix: false,
+    premium: false,
+    credits: "Vern",
+    cooldowns: 5,
+    category: "social"
 };
 
-module.exports.run = async ({ api, event, args }) => {
-  const { threadID, messageID, senderID } = event;
-  const uuid = getGUID();
-  const formData = {
-    "input": {
-      "composer_entry_point": "inline_composer",
-      "composer_source_surface": "timeline",
-      "idempotence_token": uuid + "_FEED",
-      "source": "WWW",
-      "attachments": [],
-      "audience": {
-        "privacy": {
-          "allow": [],
-          "base_state": "FRIENDS", // SELF EVERYONE
-          "deny": [],
-          "tag_expansion_state": "UNSPECIFIED"
+module.exports.run = async function ({ api, event, args }) {
+    const { threadID, messageID, messageReply, attachments } = event;
+    let postMessage = args.join(" ");
+    let files = [];
+
+    try {
+        // Gather attachments from reply or direct message
+        const allAttachments = messageReply?.attachments?.length
+            ? messageReply.attachments
+            : attachments || [];
+
+        // Download all attachments
+        for (const attachment of allAttachments) {
+            const filePath = path.join(__dirname, "cache", attachment.filename);
+
+            const fileResponse = await axios({
+                url: attachment.url,
+                method: "GET",
+                responseType: "stream",
+                headers: { "User-Agent": "Mozilla/5.0" }
+            });
+
+            await fs.ensureDir(path.dirname(filePath));
+            const writer = fs.createWriteStream(filePath);
+            fileResponse.data.pipe(writer);
+
+            await new Promise((resolve, reject) => {
+                writer.on("finish", resolve);
+                writer.on("error", reject);
+            });
+
+            files.push(fs.createReadStream(filePath));
         }
-      },
-      "message": {
-        "ranges": [],
-        "text": ""
-      },
-      "with_tags_ids": [],
-      "inline_activities": [],
-      "explicit_place_id": "0",
-      "text_format_preset_id": "0",
-      "logging": {
-        "composer_session_id": uuid
-      },
-      "tracking": [
-        null
-      ],
-      "actor_id": api.getCurrentUserID(),
-      "client_mutation_id": Math.floor(Math.random()*17)
-    },
-    "displayCommentsFeedbackContext": null,
-    "displayCommentsContextEnableComment": null,
-    "displayCommentsContextIsAdPreview": null,
-    "displayCommentsContextIsAggregatedShare": null,
-    "displayCommentsContextIsStorySet": null,
-    "feedLocation": "TIMELINE",
-    "feedbackSource": 0,
-    "focusCommentID": null,
-    "gridMediaWidth": 230,
-    "groupID": null,
-    "scale": 3,
-    "privacySelectorRenderLocation": "COMET_STREAM",
-    "renderLocation": "timeline",
-    "useDefaultActor": false,
-    "inviteShortLinkKey": null,
-    "isFeed": false,
-    "isFundraiser": false,
-    "isFunFactPost": false,
-    "isGroup": false,
-    "isTimeline": true,
-    "isSocialLearning": false,
-    "isPageNewsFeed": false,
-    "isProfileReviews": false,
-    "isWorkSharedDraft": false,
-    "UFI2CommentsProvider_commentsKey": "ProfileCometTimelineRoute",
-    "hashtag": null,
-    "canUserManageOffers": false
-  };
 
-  const audienceOptions = {
-    "1": "EVERYONE",
-    "2": "FRIENDS",
-    "3": "SELF"
-  };
+        const postData = { body: postMessage };
+        if (files.length > 0) postData.attachment = files;
 
-  const audienceChoice = args[0];
-  const content = args.slice(1).join(" ");
+        // Attempt to create post
+        api.createPost(postData)
+            .then((url) => {
+                api.sendMessage(
+                    `✅ Post created successfully!\n🔗 ${url || "No URL returned."}`,
+                    threadID,
+                    messageID
+                );
+            })
+            .catch((error) => {
+                const errorUrl = error?.data?.story_create?.story?.url;
+                if (errorUrl) {
+                    return api.sendMessage(
+                        `✅ Post created successfully!\n🔗 ${errorUrl}\n⚠️ (Note: Post created with server warnings)`,
+                        threadID,
+                        messageID
+                    );
+                }
 
-  if (!audienceOptions[audienceChoice]) {
-    return api.sendMessage("Invalid audience choice. Please choose 1, 2, or 3.", threadID, messageID);
-  }
+                let errorMessage = "❌ An unknown error occurred.";
+                if (error?.errors?.length > 0) {
+                    errorMessage = error.errors.map(e => e.message).join("\n");
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
 
-  formData.input.audience.privacy.base_state = audienceOptions[audienceChoice];
-  formData.input.message.text = content;
+                api.sendMessage(`❌ Error creating post:\n${errorMessage}`, threadID, messageID);
+            })
+            .finally(() => {
+                // Clean up downloaded files
+                files.forEach(file => {
+                    if (file.path) {
+                        fs.unlink(file.path).catch(err => {
+                            if (err) console.error("❌ File delete error:", err);
+                        });
+                    }
+                });
+            });
 
-  try {
-    const postResult = await createPost(api, formData);
-    return api.sendMessage(`Post created successfully:\nPost ID: ${postResult.postID}\nPost URL: ${postResult.postURL}`, threadID, messageID);
-  } catch (error) {
-    console.error("Error creating post:", error);
-    return api.sendMessage("Failed to create post. Please try again later.", threadID, messageID);
-  }
+    } catch (err) {
+        console.error("❌ Error processing post:", err);
+        api.sendMessage("❌ An error occurred while creating the post.", threadID, messageID);
+    }
 };
-
-async function createPost(api, formData) {
-  return new Promise((resolve, reject) => {
-    const form = {
-      av: api.getCurrentUserID(),
-      fb_api_req_friendly_name: "ComposerStoryCreateMutation",
-      fb_api_caller_class: "RelayModern",
-      doc_id: "7711610262190099",
-      variables: JSON.stringify(formData)
-    };
-
-    api.httpPost('https://www.facebook.com/api/graphql/', form, (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        try {
-          const responseData = JSON.parse(result.replace("for (;;);", ""));
-          const postID = responseData.data.story_create.story.legacy_story_hideable_id;
-          const postURL = responseData.data.story_create.story.url;
-          resolve({ postID, postURL });
-        } catch (parseError) {
-          reject(parseError);
-        }
-      }
-    });
-  });
-}
-
-function getGUID() {
-  var sectionLength = Date.now();
-  var id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = Math.floor((sectionLength + Math.random() * 16) % 16);
-    sectionLength = Math.floor(sectionLength / 16);
-    var _guid = (c == "x" ? r : (r & 7) | 8).toString(16);
-    return _guid;
-  });
-  return id;
-  }
