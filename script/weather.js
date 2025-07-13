@@ -7,7 +7,7 @@ module.exports.config = {
   credits: "vern",
   description: "Get the current weather info for a city.",
   usage: "/weather <city>",
-  prefix: true,
+  prefix: false,
   cooldowns: 3,
   commandCategory: "Utility"
 };
