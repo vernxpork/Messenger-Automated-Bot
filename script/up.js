@@ -29,7 +29,7 @@ module.exports.config = {
     name: "up",
     version: "1.0.2",
     role: 0,
-    credits: "cliff",
+    credits: "Vern",
     description: "Get bot uptime and system information",
     hasPrefix: false,
     cooldown: 5,
