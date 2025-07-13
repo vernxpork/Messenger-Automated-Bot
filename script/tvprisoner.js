@@ -27,7 +27,7 @@ module.exports.run = async ({ api, event }) => {
   }
 
   const imageUrl = encodeURIComponent(attachment.url);
-  const apiUrl = `https://kaiz-apis.gleeze.com/api/tv-prisoner?imageUrl=${imageUrl}&apikey=ILOVEU FAITH `;
+  const apiUrl = `https://kaiz-apis.gleeze.com/api/tv-prisoner?imageUrl=${imageUrl}&apikey=4fe7e522-70b7-420b-a746-d7a23db49ee5`;
 
   try {
     api.sendMessage("📺 Applying TV Prisoner effect, please wait...", threadID, messageID);
